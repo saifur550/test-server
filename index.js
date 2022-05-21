@@ -18,8 +18,10 @@ function verifyJWT (req, res, next){
   }
   const token = authHeader.split(' ')[1]; //
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
+    
     if (err) {
       return res.status(403).send({ message: 'Forbidden access' })
+      console.log(err);
     }
     req.decoded = decoded;
     next();
@@ -44,17 +46,15 @@ async function run(){
         const doctorCollection =client.db('doctors_portal').collection('doctors')
 
 
-        const verifyAdmin = async (req, res, next )=>{
+        const verifyAdmin = async (req, res, next) => {
           const requester = req.decoded.email;
-          const requesterAccount = await userCollection.findOne({email:requester})
-          if(requesterAccount.role === 'admin'){
-            next()
+          const requesterAccount = await userCollection.findOne({ email: requester });
+          if (requesterAccount.role === 'admin') {
+            next();
           }
-
-          else{
-            return res.status(403).send({ message: 'Forbidden access' })
+          else {
+            res.status(403).send({ message: 'forbidden' });
           }
-
         }
 
 
@@ -72,7 +72,7 @@ async function run(){
 
 
         //get all user 
-        app.get('/user' , verifyJWT,  async( req, res)=>{
+        app.get('/user' , verifyJWT,  async ( req, res)=>{
           const users = await userCollection.find().toArray()
           res.send(users)
         })
@@ -187,7 +187,7 @@ async function run(){
 
       })
 
-      app.post('/doctor' , verifyJWT, verifyAdmin,  async ( req, res)=>{
+      app.post('/doctor' , verifyJWT, verifyAdmin,  async ( req, res) =>{
         const doctor = req.body
         const result = await doctorCollection.insertOne(doctor)
         res.send(result)
