@@ -187,9 +187,27 @@ async function run(){
 
       })
 
-      app.post('/doctor',verifyJWT, verifyAdmin,  async ( req, res) =>{
+      app.post('/doctor', async ( req, res) =>{
         const doctor = req.body
+        // console.log(doctor);
         const result = await doctorCollection.insertOne(doctor)
+        res.send(result)
+      })
+
+
+      app.get('/doctor', async ( req, res) =>{
+        const doctors = await  doctorCollection.find().toArray()
+        res.send(doctors)
+      })
+
+      
+
+      //delete
+      app.delete('/doctor/:email', async ( req, res) =>{
+       const email = req.params.email;
+       const filter = {email:email}
+      //  console.log(filter);
+        const result = await doctorCollection.deleteOne(filter)
         res.send(result)
       })
         
